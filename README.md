@@ -1,3 +1,5 @@
+> Maintained fork of [klausbetz/apple-identity-provider-keycloak](https://github.com/klausbetz/apple-identity-provider-keycloak) (Apache-2.0), forked at 1.17.0 (`665011f`). Built and shipped via [bl4ko/public-images](https://github.com/bl4ko/public-images) as `ghcr.io/bl4ko/keycloak-apple-idp`.
+
 # Apple Identity Provider for Keycloak :apple:
 
 This repository represents an extension for [Keycloak](https://www.keycloak.org), which
@@ -132,4 +134,3 @@ Keycloak tokens.
 | `user_profile`     | `{ "name": { "firstName": string, "lastName": string }, "email": string }` optional. The JSON string that Apple sends on the first login (only required for the first login  if you want to store the user's name) |
 | `app_identifier`   | the ServiceID/BundleID the authorization was invoked with. You can omit this field if the ServiceID in Keycloak is the same as the BundleID                                                                        |
 | `app_redirect_uri` | the Redirect URI the authorization was invoked with (since `1.16.0`)                                                                                                                                               |
-
