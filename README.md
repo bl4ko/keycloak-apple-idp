@@ -1,4 +1,11 @@
-> Maintained fork of [klausbetz/apple-identity-provider-keycloak](https://github.com/klausbetz/apple-identity-provider-keycloak) (Apache-2.0), forked at 1.17.0 (`665011f`). Built and shipped via [bl4ko/public-images](https://github.com/bl4ko/public-images) as `ghcr.io/bl4ko/keycloak-apple-idp`.
+> Maintained fork of [klausbetz/apple-identity-provider-keycloak](https://github.com/klausbetz/apple-identity-provider-keycloak) (Apache-2.0), forked at 1.17.0 (`665011f`). Built and published from this repo as `ghcr.io/bl4ko/keycloak-apple-idp` (JAR-only image for use as a Keycloak init container).
+>
+> Fork changes:
+> - retry transient Apple token-endpoint connection failures (upstream [#116](https://github.com/klausbetz/apple-identity-provider-keycloak/issues/116))
+> - idempotent callback: duplicate callback delivery no longer fails login with `ModelDuplicateException` (upstream [#117](https://github.com/klausbetz/apple-identity-provider-keycloak/issues/117))
+> - `Token-Exchange links existing accounts` now defaults to **off** (secure default against email-based account linking)
+> - client-secret JWT regenerated 5 minutes before expiry; failed generation raises an error instead of sending a null secret
+> - tests run in CI and gate the image build (upstream [#16](https://github.com/klausbetz/apple-identity-provider-keycloak/issues/16))
 
 # Apple Identity Provider for Keycloak :apple:
 

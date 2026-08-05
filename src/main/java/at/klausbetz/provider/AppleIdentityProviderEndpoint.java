@@ -14,6 +14,7 @@ import org.keycloak.events.Errors;
 import org.keycloak.events.EventBuilder;
 import org.keycloak.events.EventType;
 import org.keycloak.models.KeycloakSession;
+import org.keycloak.models.ModelDuplicateException;
 import org.keycloak.models.RealmModel;
 import org.keycloak.services.ErrorPage;
 import org.keycloak.services.Urls;
@@ -81,7 +82,14 @@ public class AppleIdentityProviderEndpoint {
                 appleIdentityProvider.prepareClientSecret(appleIdentityProvider.getConfig().getClientId());
                 BrokeredIdentityContext federatedIdentity = appleIdentityProvider.sendTokenRequest(authorizationCode, appleIdentityProvider.getConfig().getClientId(), user, authSession, Urls.identityProviderAuthnResponse(context.getUri().getBaseUri(), appleIdentityProvider.getConfig().getAlias(), context.getRealm().getName()).toString());
                 if (federatedIdentity != null) {
-                    return callback.authenticated(federatedIdentity);
+                    try {
+                        return callback.authenticated(federatedIdentity);
+                    } catch (ModelDuplicateException e) {
+                        // duplicate callback delivery (LB/proxy retry) raced first-broker-login into a duplicate
+                        // federated-identity insert; the link now exists, so a second pass logs in normally (upstream issue #117)
+                        logger.warn("Duplicate federated identity during apple callback, retrying as existing-user login", e);
+                        return callback.authenticated(federatedIdentity);
+                    }
                 }
             }
         } catch (WebApplicationException e) {

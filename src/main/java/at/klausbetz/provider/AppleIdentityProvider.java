@@ -174,17 +174,21 @@ public class AppleIdentityProvider extends OIDCIdentityProvider implements Socia
 
     public void prepareClientSecret(String clientId) {
         if (!isValidSecret(getConfig().getClientSecret())) {
-            getConfig().setClientSecret(generateJWS(
+            String secret = generateJWS(
                     getConfig().getClientSecret(),
                     getConfig().getKeyId(),
                     getConfig().getTeamId(),
-                    clientId)
-            );
+                    clientId);
+            if (secret == null) {
+                throw new IdentityBrokerException("Unable to generate Apple client secret JWT — check teamId/keyId/p8 key configuration");
+            }
+            getConfig().setClientSecret(secret);
         }
     }
 
     public BrokeredIdentityContext sendTokenRequest(String authorizationCode, String clientId, String userDataJson, AuthenticationSessionModel authSession, String redirectUri) throws IOException {
-        SimpleHttp.Response response = generateTokenRequest(authorizationCode, clientId, redirectUri).asResponse();
+        // retry transient connection failures (e.g. NoHttpResponseException on stale pooled connections), see upstream issue #116
+        SimpleHttp.Response response = Retry.withRetry(() -> generateTokenRequest(authorizationCode, clientId, redirectUri).asResponse(), 3);
 
         if (response.getStatus() > 299) {
             logger.warn("Error response from apple: status=" + response.getStatus() + ", body=" + response.asString() + " Please consult the docs at https://github.com/klausbetz/apple-identity-provider-keycloak for troubleshooting");
@@ -256,7 +260,8 @@ public class AppleIdentityProvider extends OIDCIdentityProvider implements Socia
             try {
                 JWSInput jws = new JWSInput(clientSecret);
                 JsonWebToken token = jws.readJsonContent(JsonWebToken.class);
-                return !token.isExpired();
+                // 5-minute margin so the secret can't expire while a token request is in flight
+                return token.getExp() != null && Time.currentTime() + 300 < token.getExp();
             } catch (JWSInputException e) {
                 logger.debug("Secret is not a valid JWS");
             }
