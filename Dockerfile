@@ -1,4 +1,4 @@
-FROM gradle:8.14-jdk17 AS builder
+FROM gradle:8.14-jdk17@sha256:048f6802c5767837f5138d19d151cf0ec7952ba9a3d2a7c8d886d448f313dffb AS builder
 COPY . /src
 WORKDIR /src
 RUN gradle test jar --no-daemon && cp build/libs/apple-identity-provider-*.jar /apple-identity-provider.jar
