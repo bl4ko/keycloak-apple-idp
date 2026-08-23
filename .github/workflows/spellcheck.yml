@@ -1,0 +1,18 @@
+name: spellcheck
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  spellcheck:
+    uses: bl4ko/shared-actions/.github/workflows/spellcheck.yml@a9c1b62ff9c2edaa740d824c977148a14cf14323 # main
