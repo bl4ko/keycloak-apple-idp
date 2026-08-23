@@ -34,7 +34,7 @@ jobs:
     permissions:
       contents: read
       packages: write
-    uses: bl4ko/shared-actions/.github/workflows/build_image.yml@a9c1b62ff9c2edaa740d824c977148a14cf14323 # main
+    uses: bl4ko/shared-actions/.github/workflows/build_image.yml@18c43ff496b736cc870138cb3b024220f094e737 # main
     with:
       tags: ghcr.io/bl4ko/keycloak-apple-idp:latest,ghcr.io/bl4ko/keycloak-apple-idp:${{ github.sha }}
       push: ${{ github.event_name == 'push' }}
