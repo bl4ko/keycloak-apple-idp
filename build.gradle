@@ -43,8 +43,7 @@ publishing {
     }
 }
 
-// run 'gradle wrapper' to regenerate gradle/ folder
+// ./gradlew :wrapper
 wrapper {
-    gradleVersion = "8.0.2"
     distributionType = Wrapper.DistributionType.BIN
 }
